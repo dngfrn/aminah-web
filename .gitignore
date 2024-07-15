@@ -1,0 +1,9 @@
+# Ignore file .env
+.env
+
+# Ignore direktori vendor
+/vendor
+/public/asset/
+
+# Ignore file log
+/storage/logs/*.log
