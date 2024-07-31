@@ -9,17 +9,20 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+
 class PemilikUsahaController extends Controller
 {
-    public function showProfile(){
+    public function showProfile()
+    {
         $data['user'] = Auth::user();
-        $data['pengajuan'] = Pengajuan::where('user_id','=',Auth::user()->id)->first();
+        $data['pengajuan'] = Pengajuan::with('review')->where('user_id', '=', Auth::user()->id)->first();
 
-        return view('pemilikUsaha.profile',$data);
+        return view('pemilikUsaha.profile', $data);
     }
 
-    public function updateProfile(Request $request){
-        $pengajuan = Pengajuan::where('user_id','=',Auth::user()->id)->first();
+    public function updateProfile(Request $request)
+    {
+        $pengajuan = Pengajuan::where('user_id', '=', Auth::user()->id)->first();
         $validates = [
             'namaUsaha'              => ['required', 'string', 'max:255'],
             'namaPemilik'            => ['required', 'string', 'max:255'],
@@ -38,12 +41,12 @@ class PemilikUsahaController extends Controller
             "gambarProduk"           => ['required', 'mimes:jpeg,jpg,bmp,png,gif,svg', 'max:10000'],
             "omsetTigaBulanTerakhir" => ['required', 'mimes:jpeg,jpg,bmp,png,gif,svg,pdf,xls,xlsx,csv', 'max:10000']
         ];
-        if($pengajuan){
+        if ($pengajuan) {
             $validates['companyProfile']            = ['nullable', 'mimes:jpeg,jpg,bmp,png,gif,svg,pdf', 'max:10000'];
             $validates['fotoKtp']                   = ['nullable', 'mimes:jpeg,jpg,bmp,png,gif,svg,pdf', 'max:10000'];
             $validates['gambarProduk']              = ['nullable', 'mimes:jpeg,jpg,bmp,png,gif,svg', 'max:10000'];
             $validates['omsetTigaBulanTerakhir']    = ['nullable', 'mimes:jpeg,jpg,bmp,png,gif,svg,pdf,xls,xlsx,csv', 'max:10000'];
-        }   
+        }
         $validate = Validator::make(
             $request->all(),
             $validates
@@ -53,7 +56,7 @@ class PemilikUsahaController extends Controller
         }
         $data = $request->except('_token');
         $data['user_id'] = Auth::user()->id;
-        if($pengajuan){
+        if ($pengajuan) {
             // Validate Folder Exists
             File::ensureDirectoryExists(public_path('asset/ktp'));
             File::ensureDirectoryExists(public_path('asset/companyProfile'));
@@ -61,63 +64,63 @@ class PemilikUsahaController extends Controller
             File::ensureDirectoryExists(public_path('asset/gambarProduk'));
 
             $files = [];
-            if($request->hasFile('fotoKtp')){
+            if ($request->hasFile('fotoKtp')) {
                 $fileKtp = $request->file('fotoKtp');
                 $filenameKtp = time() . "." . $fileKtp->extension();
                 $fileKtp->move(public_path('asset/ktp'), $filenameKtp);
                 $data['fotoKtp'] = $filenameKtp;
 
-                if(File::exists(public_path('asset/ktp/'.$pengajuan->fotoKtp))){
-                    $files[] = public_path('asset/ktp/'.$pengajuan->fotoKtp);
+                if (File::exists(public_path('asset/ktp/' . $pengajuan->fotoKtp))) {
+                    $files[] = public_path('asset/ktp/' . $pengajuan->fotoKtp);
                 }
             }
-            if($request->hasFile('gambarProduk')){
+            if ($request->hasFile('gambarProduk')) {
                 $fileGambarProduk = $request->file('gambarProduk');
                 $filenameGambarProduk = time() . "." . $fileGambarProduk->extension();
                 $fileGambarProduk->move(public_path('asset/gambarProduk'), $filenameGambarProduk);
                 $data['gambarProduk'] = $filenameGambarProduk;
 
-                if(File::exists(public_path('asset/gambarProduk/'.$pengajuan->gambarProduk))){
-                    $files[] = public_path('asset/gambarProduk/'.$pengajuan->gambarProduk);
+                if (File::exists(public_path('asset/gambarProduk/' . $pengajuan->gambarProduk))) {
+                    $files[] = public_path('asset/gambarProduk/' . $pengajuan->gambarProduk);
                 }
             }
 
-            if($request->hasFile('omsetTigaBulanTerakhir')){
+            if ($request->hasFile('omsetTigaBulanTerakhir')) {
                 $fileOmsetTigaBulan = $request->file('omsetTigaBulanTerakhir');
                 $filenameOmsetTigaBulan = time() . "." . $fileOmsetTigaBulan->extension();
                 $fileOmsetTigaBulan->move(public_path('asset/omsetTigaBulanTerakhir'), $filenameOmsetTigaBulan);
                 $data['omsetTigaBulanTerakhir'] = $filenameOmsetTigaBulan;
 
-                if(File::exists(public_path('asset/omsetTigaBulanTerakhir/'.$pengajuan->omsetTigaBulanTerakhir))){
-                    $files[] = public_path('asset/omsetTigaBulanTerakhir/'.$pengajuan->omsetTigaBulanTerakhir);
+                if (File::exists(public_path('asset/omsetTigaBulanTerakhir/' . $pengajuan->omsetTigaBulanTerakhir))) {
+                    $files[] = public_path('asset/omsetTigaBulanTerakhir/' . $pengajuan->omsetTigaBulanTerakhir);
                 }
             }
 
-            if($request->hasFile('companyProfile')){
+            if ($request->hasFile('companyProfile')) {
                 $fileCompanyProfile = $request->file('companyProfile');
                 $filenameCompanyProfile = time() . "." . $fileCompanyProfile->extension();
                 $fileCompanyProfile->move(public_path('asset/companyProfile'), $filenameCompanyProfile);
                 $data['companyProfile'] = $filenameCompanyProfile;
 
-                if(File::exists(public_path('asset/companyProfile/'.$pengajuan->companyProfile))){
-                    $files[] = public_path('asset/companyProfile/'.$pengajuan->companyProfile);
+                if (File::exists(public_path('asset/companyProfile/' . $pengajuan->companyProfile))) {
+                    $files[] = public_path('asset/companyProfile/' . $pengajuan->companyProfile);
                 }
             }
-            if(count($files) > 0){
+            if (count($files) > 0) {
                 File::delete($files);
             }
             Pengajuan::find($pengajuan->id)->update($data);
-            $checkReview = Review::where('pengajuan_id','=',$pengajuan->id)->first();
-            if($checkReview){
+            $checkReview = Review::where('pengajuan_id', '=', $pengajuan->id)->first();
+            if ($checkReview) {
                 $checkReview->statusPengajuan = "REVIEW";
-                $checkReview->save();    
-            }else{
+                $checkReview->save();
+            } else {
                 Review::create([
-                    "pengajuan_id"=>$pengajuan->id,
+                    "pengajuan_id" => $pengajuan->id,
                     "statusPengajuan" => "REVIEW"
                 ]);
             }
-        }else{
+        } else {
             $fileKtp = $request->file('fotoKtp');
             $filenameKtp = time() . "." . $fileKtp->extension();
             sleep(1);
@@ -151,37 +154,49 @@ class PemilikUsahaController extends Controller
 
             $datas = Pengajuan::create($data);
             Review::create([
-                "pengajuan_id"=>$datas->id,
+                "pengajuan_id" => $datas->id,
                 "statusPengajuan" => "REVIEW"
             ]);
         }
 
         return redirect()->back()->withSuccess('Data berhasil disimpan !');
-
-
     }
 
-    public function receivePendanaan(Request $request){
-        $pengajuan = Pengajuan::where('user_id',Auth::user()->id)->first();
-        if($pengajuan){
-            Review::where('pengajuan_id',$pengajuan->id)->update([
-                "statusPengajuan"=>"RECEIVED"
+    public function receivePendanaan(Request $request)
+    {
+        $pengajuan = Pengajuan::where('user_id', Auth::user()->id)->first();
+        if ($pengajuan) {
+            Review::where('pengajuan_id', $pengajuan->id)->update([
+                "statusPengajuan" => "RECEIVED"
             ]);
-            return Response::json(['icon' => 'success' ,'message' => 'Success']);
-        }else{
-            return Response::json(['icon' => 'success' ,'message' => 'Pengajuan Not Found'],422);
+            return Response::json(['icon' => 'success', 'message' => 'Success']);
+        } else {
+            return Response::json(['icon' => 'success', 'message' => 'Pengajuan Not Found'], 422);
         }
     }
 
-    public function sendPendanaan(Request $request){
-        $pengajuan = Pengajuan::where('user_id',Auth::user()->id)->first();
-        if($pengajuan){
-            Review::where('pengajuan_id',$pengajuan->id)->update([
-                "statusPengajuan"=>"TRANSFERED"
+    public function sendPendanaan(Request $request)
+    {
+        $pengajuan = Pengajuan::where('user_id', Auth::user()->id)->first();
+        if ($pengajuan) {
+            Review::where('pengajuan_id', $pengajuan->id)->update([
+                "statusPengajuan" => "TRANSFERED"
             ]);
-            return Response::json(['icon' => 'success' ,'message' => 'Success']);
-        }else{
-            return Response::json(['icon' => 'success' ,'message' => 'Pengajuan Not Found'],422);
+            return Response::json(['icon' => 'success', 'message' => 'Success']);
+        } else {
+            return Response::json(['icon' => 'success', 'message' => 'Pengajuan Not Found'], 422);
+        }
+    }
+
+    public function cancelPengajuan($id)
+    {
+        $review = Review::where('pengajuan_id', $id)->first();
+        if ($review) {
+            $review->statusPengajuan = 'CANCELED';
+            $review->save();
+            return redirect()->back()->withSuccess('Sukses! Pengajuan berhasil dibatalkan.');
+        } else {
+            return redirect()->back()->withErrors('Gagal! Pengajuan tidak ditemukan.');
         }
     }
 }

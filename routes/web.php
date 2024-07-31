@@ -17,16 +17,17 @@ use App\Http\Controllers\PengajuanController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 Auth::routes();
 
 // Route::get('/', function () {
 //     return redirect()->route('home');
 // });
 
-Route::get('/','DashboardController@index')->name('indexPage');
-Route::get('/daftar-usaha','DashboardController@listUsaha')->name('listUsaha');
-Route::get('/formulir-pendanaan','DashboardController@formulirPendanaan')->name('formulirPendanaan');
-Route::post('/formulir-pendanaan','DashboardController@sendFormulirPendanaan')->name('sendFormulirPendanaan');
+Route::get('/', 'DashboardController@index')->name('indexPage');
+Route::get('/daftar-usaha', 'DashboardController@listUsaha')->name('listUsaha');
+Route::get('/formulir-pendanaan', 'DashboardController@formulirPendanaan')->name('formulirPendanaan');
+Route::post('/formulir-pendanaan', 'DashboardController@sendFormulirPendanaan')->name('sendFormulirPendanaan');
 
 Route::get('/home', 'HomeController@index')->name('home');
 
@@ -37,8 +38,8 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-Route::group(['middleware'=>'auth'],function(){
-    Route::group(['prefix'=>'users','as'=>"users.",'controller'=>UserController::class],function(){
+Route::group(['middleware' => 'auth'], function () {
+    Route::group(['prefix' => 'users', 'as' => "users.", 'controller' => UserController::class], function () {
         Route::get("/", 'index')->name("index");
         Route::post('/show', 'show')->name('show');
         Route::get('/add', 'create')->name('create');
@@ -46,10 +47,10 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('/edit/{id}', 'edit')->name('edit');
         Route::put('/update/{id}', 'update')->name('update');
         Route::get('/destroy/{id}', 'destroy')->name('destroy');
-        Route::get('/get-list-user','listUser')->name('listUser');
+        Route::get('/get-list-user', 'listUser')->name('listUser');
     });
-    Route::group(['prefix'=>'pemodal','as'=>'pemodal.'],function(){
-        Route::group(['controller'=>PemodalController::class],function(){
+    Route::group(['prefix' => 'pemodal', 'as' => 'pemodal.'], function () {
+        Route::group(['controller' => PemodalController::class], function () {
             Route::get("/", 'index')->name("index");
             Route::post('/show', 'show')->name('show');
             Route::get('/add', 'create')->name('create');
@@ -58,7 +59,7 @@ Route::group(['middleware'=>'auth'],function(){
             Route::put('/update/{id}', 'update')->name('update');
             Route::get('/destroy/{id}', 'destroy')->name('destroy');
         });
-        Route::group(['controller'=>PemodalSubController::class],function(){
+        Route::group(['controller' => PemodalSubController::class], function () {
             Route::get("/sub", 'index')->name("subIndex");
             Route::get('/sub/show/{id}', 'show')->name('subShow');
             Route::post('/sub/store', 'store')->name('subStore');
@@ -76,23 +77,25 @@ Route::group(['middleware'=>'auth'],function(){
         });
     });
     Route::resource('pengajuan', PengajuanController::class);
-    Route::group(['prefix'=>'pengajuan','as'=>'pengajuan.'],function(){
-        Route::post('/approve-pengajuan/{id}','PengajuanController@approvePengajuan')->name('approvePengajuan');
+    Route::group(['prefix' => 'pengajuan', 'as' => 'pengajuan.'], function () {
+        Route::post('/approve-pengajuan/{id}', 'PengajuanController@approvePengajuan')->name('approvePengajuan');
     });
-    Route::group(['prefix'=>'pemilik-usaha','as'=>'pemilikUsaha.'],function(){
-        Route::get('/profile','PemilikUsahaController@showProfile')->name('profile');
-        Route::put('/profile','PemilikUsahaController@updateProfile')->name('profileUpdate');
-        Route::post('/terima-pendanaan','PemilikUsahaController@receivePendanaan')->name('receivePendanaan');
-        Route::post('/setor-pendanaan','PemilikUsahaController@sendPendanaan')->name('sendPendanaan');
+    Route::group(['prefix' => 'pemilik-usaha', 'as' => 'pemilikUsaha.'], function () {
+        Route::get('/profile', 'PemilikUsahaController@showProfile')->name('profile');
+        Route::put('/profile', 'PemilikUsahaController@updateProfile')->name('profileUpdate');
+        Route::get('/cancelPengajuan/{id}', 'PemilikUsahaController@cancelPengajuan')->name('cancelPengajuan');
+        Route::post('/terima-pendanaan', 'PemilikUsahaController@receivePendanaan')->name('receivePendanaan');
+        Route::post('/setor-pendanaan', 'PemilikUsahaController@sendPendanaan')->name('sendPendanaan');
     });
-    Route::group(['prefix'=>'admin','as'=>'admin.','middleware'=>'role:admin'],function(){
-        Route::get('/keuangan-pelaku-usaha','AdminController@showKeuanganPelakuUsaha')->name('showKeuanganPelakuUsaha');
-        Route::post('/transfer-pelaku-usaha/{id}','AdminController@updateTransferedPelakuUsaha')->name('updateTransferedPelakuUsaha');
-        Route::post('/complete-pelaku-usaha/{id}','AdminController@updateDonePelakuUsaha')->name('updateDonePelakuUsaha');
-        Route::get('/keuangan-pemodal','AdminController@showKeuanganPemodal')->name('showKeuanganPemodal');
-        Route::post('/accept-pemodal-transfer/{id}','AdminController@acceptPemodalTransfer')->name('acceptPemodalTransfer');
-        Route::post('/reject-pemodal-transfer/{id}','AdminController@rejectPemodalTransfer')->name('rejectPemodalTransfer');
-        Route::post('/pemodal-transfered/{id}','AdminController@PemodalTransfered')->name('PemodalTransfered');
+
+    Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'role:admin'], function () {
+        Route::get('/keuangan-pelaku-usaha', 'AdminController@showKeuanganPelakuUsaha')->name('showKeuanganPelakuUsaha');
+        Route::post('/transfer-pelaku-usaha/{id}', 'AdminController@updateTransferedPelakuUsaha')->name('updateTransferedPelakuUsaha');
+        Route::post('/complete-pelaku-usaha/{id}', 'AdminController@updateDonePelakuUsaha')->name('updateDonePelakuUsaha');
+        Route::get('/keuangan-pemodal', 'AdminController@showKeuanganPemodal')->name('showKeuanganPemodal');
+        Route::post('/accept-pemodal-transfer/{id}', 'AdminController@acceptPemodalTransfer')->name('acceptPemodalTransfer');
+        Route::post('/reject-pemodal-transfer/{id}', 'AdminController@rejectPemodalTransfer')->name('rejectPemodalTransfer');
+        Route::post('/pemodal-transfered/{id}', 'AdminController@PemodalTransfered')->name('PemodalTransfered');
     });
 });
 // Route::group(['middleware' => ['auth', 'role:admin']], function () {

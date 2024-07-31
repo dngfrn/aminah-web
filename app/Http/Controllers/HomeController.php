@@ -40,11 +40,15 @@ class HomeController extends Controller
                     return redirect()->route('pemilikUsaha.profile')->withErrors('Lengkapi Profile Usaha Terlebih Dahulu');
                 } else {
                     $pengajuan = Pengajuan::with('review')->where('user_id', '=', Auth::user()->id)->first();
-                    $data['totalPengajuan'] = $pengajuan->jumlahPengajuan;
+                    if ($pengajuan->review->statusPengajuan == 'CANCELED') {
+                        $data['totalPengajuan'] = null;
+                    } else {
+                        $data['totalPengajuan'] = $pengajuan->jumlahPengajuan;
+                    }
                     $dataSummary = Pendanaan::whereHas('review', function ($query) use ($pengajuan) {
-                        $query->whereNotIn('statusPengajuan', ['REJECT', 'REVIEW'])->where('pengajuan_id', $pengajuan->id);
+                        $query->whereNotIn('statusPengajuan', ['REJECT', 'REVIEW', 'CANCELED'])->where('pengajuan_id', $pengajuan->id);
                     })->select(\DB::raw('SUM(totalPembayaran) as total'), \DB::raw('COUNT(*) as total_investor'))->whereHas('statusPendanaan', function ($query) {
-                        $query->whereNotIn('statusPendanaan', ['REJECT', 'PENDING']);
+                        $query->whereNotIn('statusPendanaan', ['REJECT', 'PENDING',]);
                     })->groupBy('review_id')->first();
                     $data['investorDetail'] = $dataSummary;
                     $data['status'] = $pengajuan->review->statusPengajuan;

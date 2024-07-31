@@ -69,8 +69,12 @@
                                     @php
                                         $totalPendanaan = @$investorDetail->total ?: 0;
                                         $totalPengajuan = @$totalPengajuan;
+                                        if ($totalPengajuan) {
+                                            $percent = ($totalPendanaan / $totalPengajuan) * 100;
+                                        } else {
+                                            $percent = 0;
+                                        }
 
-                                        $percent = ($totalPendanaan / $totalPengajuan) * 100;
                                     @endphp
                                     <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ $percent }}%</div>
                                 </div>
@@ -110,32 +114,37 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Status Pengajuan Anda
+    @if ($status !== 'CANCELED')
+        <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Status Pengajuan Anda
+                                </div>
+
+
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ str_replace('_', ' ', $status) }}
+                                </div>
+                                @if ($status == 'TRANSFER_USER')
+                                    <a onclick="swalApprove('{{ route('pemilikUsaha.receivePendanaan') }}','Receive')"
+                                        class="mt-4 btn btn-success btn-sm">Terima Dana</a>
+                                @endif
+                                @if ($status == 'RECEIVED')
+                                    <a onclick="swalApprove('{{ route('pemilikUsaha.sendPendanaan') }}','Send')"
+                                        class="mt-4 btn btn-success btn-sm">Setor Dana</a>
+                                @endif
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ str_replace('_', ' ', $status) }}</div>
-                            @if ($status == 'TRANSFER_USER')
-                                <a onclick="swalApprove('{{ route('pemilikUsaha.receivePendanaan') }}','Receive')"
-                                    class="mt-4 btn btn-success btn-sm">Terima Dana</a>
-                            @endif
-                            @if ($status == 'RECEIVED')
-                                <a onclick="swalApprove('{{ route('pemilikUsaha.sendPendanaan') }}','Send')"
-                                    class="mt-4 btn btn-success btn-sm">Setor Dana</a>
-                            @endif
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     @push('scripts')
         <script>
@@ -147,7 +156,7 @@
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, "+status+" it!"
+                    confirmButtonText: "Yes, " + status + " it!"
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({

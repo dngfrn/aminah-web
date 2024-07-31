@@ -1,6 +1,14 @@
 @extends('layouts.admin')
-
 @section('main-content')
+
+    <style>
+        @media (min-width: 768px) {
+            .flex-md {
+                display: flex;
+
+            }
+        }
+    </style>
     <!-- Page Heading -->
     <h1 class="h3 mb-4 text-gray-800">{{ __('Profile Usaha') }}</h1>
 
@@ -28,341 +36,535 @@
 
         <div class="col-lg-12 order-lg-1">
 
-            <div class="card shadow mb-4">
 
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Detail Profile Usaha</h6>
-                </div>
+            <form method="POST" action="{{ route('pemilikUsaha.profileUpdate') }}" enctype="multipart/form-data"
+                autocomplete="off">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary text-lg">Detail Profile Usaha</h6>
+                        <div class="d-flex flex-row">
+                            @if ($pengajuan->review->statusPengajuan != 'CANCELED')
+                                <button type="submit" name="action" value="submitUpdateProfile"
+                                    class="btn btn-primary mr-3">Simpan</button>
+                            @endif
 
-                <div class="card-body">
+                            @if ($pengajuan->review->statusPengajuan == 'REVIEW')
+                                <a href="#"
+                                    onclick="modalCancelPengajuan('{{ route('pemilikUsaha.cancelPengajuan', $pengajuan->id) }}')"
+                                    class="btn btn-danger">Batalkan Pengajuan</a>
+                            @endif
 
-                    <form method="POST" action="{{ route('pemilikUsaha.profileUpdate') }}"  enctype="multipart/form-data" autocomplete="off">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-                        <input type="hidden" name="_method" value="PUT">
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="">User</label>
-                                    <input type="text" value="{{ $user->name }}" disabled class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-
-                                    <label for="">Nama Usaha</label>
-                                    <input type="namaUsaha"
-                                        class="form-control @if ($errors->has('namaUsaha')) is-invalid @endif"
-                                        id="namaUsaha" name="namaUsaha"
-                                        value="{{ old('namaUsaha') ?: @$pengajuan->namaUsaha }}" placeholder="Nama Usaha">
-                                    @if ($errors->has('namaUsaha'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('namaUsaha') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="">Nama Pemilik</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('namaPemilik')) is-invalid @endif"
-                                        id="namaPemilik" name="namaPemilik"
-                                        value="{{ old('namaPemilik') ?: (@$pengajuan->namaPemilik ?: $user->name) }}"
-                                        placeholder="Nama Pemilik">
-                                    @if ($errors->has('namaPemilik'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('namaPemilik') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
+                    </div>
 
-                                    <label for="">Alamat Usaha</label>
-                                    <textarea class="form-control @if ($errors->has('alamatUsaha')) is-invalid @endif" id="alamatUsaha" name="alamatUsaha"
-                                        placeholder="Alamat Usaha">{{ old('alamatUsaha') ?: @$pengajuan->alamatUsaha }}</textarea>
-                                    @if ($errors->has('alamatUsaha'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('alamatUsaha') }}
-                                        </div>
-                                    @endif
-                                </div>
+                    @if ($pengajuan->review->statusPengajuan == 'CANCELED')
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light">
+                            <div class="font-weight-bold">
+                                Status Pengajuan : <span
+                                    class="text-danger">{{ $pengajuan->review->statusPengajuan }}</span>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
+                            <div>
+                                <button type="submit" name="action" value="buatPengajuanBaru"
+                                    class="btn btn-primary mr-3  "> <i class="fa-solid fa-plus mr-2"></i>Buat Pengajuan
+                                    Baru</button>
 
-                                    <label for="">NIK</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('nik')) is-invalid @endif"
-                                        id="nik" name="nik" placeholder="NIK"
-                                        value="{{ old('nik') ?: @$pengajuan->nik }}">
-                                    @if ($errors->has('nik'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('nik') }}
-                                        </div>
-                                    @endif
-                                </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
 
-                                    <label for="">Kategori Usaha</label>
-                                    <input type="kategori"
-                                        class="form-control @if ($errors->has('kategoriUsaha')) is-invalid @endif"
-                                        id="kategori" name="kategoriUsaha" placeholder="Kategori Usaha"
-                                        value="{{ old('kategoriUsaha') ?: @$pengajuan->kategoriUsaha }}">
-                                    @if ($errors->has('kategoriUsaha'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('kategoriUsaha') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Alamat Pemilik Usaha</label>
-                                    <textarea class="form-control @if ($errors->has('alamat')) is-invalid @endif" id="alamat" name="alamat"
-                                        placeholder="Alamat Pemilik Usaha">{{ old('alamat') ?: @$pengajuan->kategoriUsaha }}</textarea>
-                                    @if ($errors->has('alamat'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('alamat') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
 
-                                    <label for="">Deskripsi Produk</label>
-                                    <textarea class="form-control @if ($errors->has('deskripsiUsaha')) is-invalid @endif" id="deskripsiUsaha"
-                                        name="deskripsiUsaha" placeholder="Deskripsi Produk">{{ old('deskripsiUsaha') ?: @$pengajuan->kategoriUsaha }}</textarea>
-                                    @if ($errors->has('deskripsiUsaha'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('deskripsiUsaha') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">No Telpon</label>
-                                    <input type="text" class="form-control" disabled id="no_telp"
-                                        value="{{ $user->noTelp }}" placeholder="Nomor Telepon">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
+                        <div class="flex-md flex-col ">
+                            <div>
+                                <table class="p-2 table  text-muted mr-5">
+                                    <tbody>
 
-                                    <label for="">Omset Perbulan</label>
-                                    <input type="text" class="form-control @if ($errors->has('omsetPerBulan')) is-invalid @endif" id="omsetPerBulan" name="omsetPerBulan" value="{{ old('omsetPerBulan') ?: @$pengajuan->omsetPerBulan }}" placeholder="Omset Per Bulan (Rp)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
-                                    @if ($errors->has('omsetPerBulan'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('omsetPerBulan') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Email</label>
-                                    <input type="email" disabled class="form-control" id="email"
-                                        value="{{ $user->email }}" placeholder="Email">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
+                                        <tr>
+                                            <td style="font-weight: 700;">User</td>
+                                            <td>{{ $user->name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Email</td>
+                                            <td>{{ $user->email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Nomor HP</td>
+                                            <td>{{ $user->noTelp }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">NIK</td>
+                                            <td>{{ $pengajuan->nik }}</td>
+                                        </tr>
 
-                                    <label for="">Rencana Penggunaan Dana</label>
-                                    <textarea class="form-control @if ($errors->has('rencanaPengajuan')) is-invalid @endif" id="rencanaPengajuan" name="rencanaPengajuan" placeholder="Rencana Penggunaan Dana">{{ old('rencanaPengajuan') ?: @$pengajuan->kategoriUsaha }}</textarea>
-                                    @if ($errors->has('rencanaPengajuan'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('rencanaPengajuan') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Jumlah Dana Yang Dibutuhkan</label>
-                                    <input type="text" class="form-control @if($errors->has('jumlahPengajuan')) is-invalid @endif" id="jumlahPengajuan" name="jumlahPengajuan" value="{{ old('jumlahPengajuan') ?: @$pengajuan->jumlahPengajuan }}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" placeholder="Jumlah Dana Yang Dibutuhkan">
-                                    @if ($errors->has('jumlahPengajuan'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('jumlahPengajuan') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
+                                        <tr>
+                                            <td style="font-weight: 700;">Nama Usaha</td>
+                                            <td>{{ $pengajuan->namaUsaha }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Nama Pemilik</td>
+                                            <td>{{ $pengajuan->namaPemilik ?: $user->name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Alamat Usaha</td>
+                                            <td>{{ $pengajuan->alamatUsaha }}</td>
+                                        </tr>
 
-                                    <label for="">Presentase Bagi Hasil</label>
-                                    <select name="persentaseBagiHasil" class="form-control @if($errors->has('persentaseBagiHasil')) is-invalid @endif" id="persentaseBagiHasil">
-                                        <option value="">-- Pilih Option -- </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 1) selected @endif value="1">1%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 2) selected @endif value="2">2%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 3) selected @endif value="3">3%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 4) selected @endif value="4">4%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 5) selected @endif value="5">5%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 6) selected @endif value="6">6%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 7) selected @endif value="7">7%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 8) selected @endif value="8">8%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 9) selected @endif value="9">9%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 10) selected @endif value="10">10%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 11) selected @endif value="11">11%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 12) selected @endif value="12">12%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 13) selected @endif value="13">13%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 14) selected @endif value="14">14%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 15) selected @endif value="15">15%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 16) selected @endif value="16">16%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 17) selected @endif value="17">17%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 18) selected @endif value="18">18%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 19) selected @endif value="19">19%
-                                        </option>
-                                        <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 20) selected @endif value="20">20%
-                                        </option>
-                                    </select>
-                                    @if ($errors->has('persentaseBagiHasil'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('persentaseBagiHasil') }}
-                                        </div>
-                                    @endif
-                                </div>
+                                        <tr>
+                                            <td style="font-weight: 700;">Kategori Usaha</td>
+                                            <td>{{ $pengajuan->kategoriUsaha }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Alamat Pemilik Usaha</td>
+                                            <td>{{ $pengajuan->alamat }}</td>
+                                        </tr>
+
+
+
+
+                                    </tbody>
+                                </table>
                             </div>
+                            <div>
+                                <table class="p-2 table  text-muted">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: 700;">Deskripsi Produk</td>
+                                            <td>{{ $pengajuan->kategoriUsaha }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Omset Perbulan</td>
+                                            <td>{{ $pengajuan->omsetPerBulan }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Rencana Penggunaan Dana</td>
+                                            <td>{{ $pengajuan->rencanaPengajuan }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Jumlah Dana Yang Dibutuhkan</td>
+                                            <td>{{ $pengajuan->jumlahPengajuan }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Persentase Bagi Hasil</td>
+                                            <td>{{ $pengajuan->persentaseBagiHasil }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Periode Bagi Hasil</td>
+                                            <td>{{ $pengajuan->periodeBagiHasil }} Bulan</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Company Profile</td>
+                                            <td>[Image]</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Foto KTP Pemilik Usaha</td>
+                                            <td>[Image]</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Gambar Produk Usaha</td>
+                                            <td>[Image]</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 700;">Laporan Keuangan Tiga Bulan Terakhir</td>
+                                            <td>[File]</td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Periode Bagi Hasil</label>
-                                    <select name="periodeBagiHasil" class="form-control @if($errors->has('periodeBagiHasil')) is-invalid @endif" id="periodeBagiHasil">
-                                        <option value="">-- Pilih Option -- </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "1") selected @endif value="1">1 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "2") selected @endif value="2">2 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "3") selected @endif value="3">3 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "4") selected @endif value="4">4 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "5") selected @endif value="5">5 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "6") selected @endif value="6">6 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "7") selected @endif value="7">7 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "8") selected @endif value="8">8 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "9") selected @endif value="9">9 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "10") selected @endif value="10">10 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "11") selected @endif value="11">11 Bulan
-                                        </option>
-                                        <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == "12") selected @endif value="12">12 Bulan
-                                        </option>
-                                    </select>
-                                    @if ($errors->has('periodeBagiHasil'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('periodeBagiHasil') }}
-                                        </div>
-                                    @endif
+                    @else
+                        <div class="card-body">
+
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                            <input type="hidden" name="_method" value="PUT">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="">User</label>
+                                        <input type="text" value="{{ $user->name }}" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Nama Usaha</label>
+                                        <input type="namaUsaha"
+                                            class="form-control @if ($errors->has('namaUsaha')) is-invalid @endif"
+                                            id="namaUsaha" name="namaUsaha"
+                                            value="{{ old('namaUsaha') ?: @$pengajuan->namaUsaha }}"
+                                            placeholder="Nama Usaha">
+                                        @if ($errors->has('namaUsaha'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('namaUsaha') }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Company Profile</label>
-                                    <input type="file" class="form-control @if($errors->has('companyProfile')) is-invalid @endif" id="companyProfile" name="companyProfile">
-                                    @if ($errors->has('companyProfile'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('companyProfile') }}
-                                        </div>
-                                    @endif
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="">Nama Pemilik</label>
+                                        <input type="text"
+                                            class="form-control @if ($errors->has('namaPemilik')) is-invalid @endif"
+                                            id="namaPemilik" name="namaPemilik"
+                                            value="{{ old('namaPemilik') ?: (@$pengajuan->namaPemilik ?: $user->name) }}"
+                                            placeholder="Nama Pemilik">
+                                        @if ($errors->has('namaPemilik'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('namaPemilik') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Alamat Usaha</label>
+                                        <textarea class="form-control @if ($errors->has('alamatUsaha')) is-invalid @endif" id="alamatUsaha" name="alamatUsaha"
+                                            placeholder="Alamat Usaha">{{ old('alamatUsaha') ?: @$pengajuan->alamatUsaha }}</textarea>
+                                        @if ($errors->has('alamatUsaha'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('alamatUsaha') }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Foto KTP Pemilik Usaha</label>
-                                    <input type="file" class="form-control @if($errors->has('fotoKtp')) is-invalid @endif" id="fotoKtp" name="fotoKtp">
-                                    @if ($errors->has('fotoKtp'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('fotoKtp') }}
-                                        </div>
-                                    @endif
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <label for="">NIK</label>
+                                        <input type="text"
+                                            class="form-control @if ($errors->has('nik')) is-invalid @endif"
+                                            id="nik" name="nik" placeholder="NIK"
+                                            value="{{ old('nik') ?: @$pengajuan->nik }}">
+                                        @if ($errors->has('nik'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('nik') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Kategori Usaha</label>
+                                        <input type="kategori"
+                                            class="form-control @if ($errors->has('kategoriUsaha')) is-invalid @endif"
+                                            id="kategori" name="kategoriUsaha" placeholder="Kategori Usaha"
+                                            value="{{ old('kategoriUsaha') ?: @$pengajuan->kategoriUsaha }}">
+                                        @if ($errors->has('kategoriUsaha'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('kategoriUsaha') }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Gambar Produk Usaha</label>
-                                    <input type="file" class="form-control @if($errors->has('gambarProduk')) is-invalid @endif" id="gambarProduk" name="gambarProduk">
-                                    @if ($errors->has('gambarProduk'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('gambarProduk') }}
-                                        </div>
-                                    @endif
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Alamat Pemilik Usaha</label>
+                                        <textarea class="form-control @if ($errors->has('alamat')) is-invalid @endif" id="alamat" name="alamat"
+                                            placeholder="Alamat Pemilik Usaha">{{ old('alamat') ?: @$pengajuan->alamat }}</textarea>
+                                        @if ($errors->has('alamat'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('alamat') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Deskripsi Produk</label>
+                                        <textarea class="form-control @if ($errors->has('deskripsiUsaha')) is-invalid @endif" id="deskripsiUsaha"
+                                            name="deskripsiUsaha" placeholder="Deskripsi Produk">{{ old('deskripsiUsaha') ?: @$pengajuan->kategoriUsaha }}</textarea>
+                                        @if ($errors->has('deskripsiUsaha'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('deskripsiUsaha') }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="">Laporan Keuangan Tiga Bulan Terakhir</label>
-                                    <input type="file" class="form-control @if($errors->has('omsetTigaBulanTerakhir')) is-invalid @endif" id="omsetTigaBulanTerakhir" name="omsetTigaBulanTerakhir">
-                                    @if ($errors->has('omsetTigaBulanTerakhir'))
-                                        <div class="invalid-feedback">
-                                            {{ $errors->first('omsetTigaBulanTerakhir') }}
-                                        </div>
-                                    @endif
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">No. Telpon</label>
+                                        <input type="text" class="form-control" disabled id="no_telp"
+                                            value="{{ $user->noTelp }}" placeholder="Nomor Telepon">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Omset Perbulan</label>
+                                        <input type="text"
+                                            class="form-control @if ($errors->has('omsetPerBulan')) is-invalid @endif"
+                                            id="omsetPerBulan" name="omsetPerBulan"
+                                            value="{{ old('omsetPerBulan') ?: @$pengajuan->omsetPerBulan }}"
+                                            placeholder="Omset Per Bulan (Rp)"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                                        @if ($errors->has('omsetPerBulan'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('omsetPerBulan') }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Button -->
-                        <div class="row">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Email</label>
+                                        <input type="email" disabled class="form-control" id="email"
+                                            value="{{ $user->email }}" placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Rencana Penggunaan Dana</label>
+                                        <textarea class="form-control @if ($errors->has('rencanaPengajuan')) is-invalid @endif" id="rencanaPengajuan"
+                                            name="rencanaPengajuan" placeholder="Rencana Penggunaan Dana">{{ old('rencanaPengajuan') ?: @$pengajuan->kategoriUsaha }}</textarea>
+                                        @if ($errors->has('rencanaPengajuan'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('rencanaPengajuan') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Jumlah Dana Yang Dibutuhkan</label>
+                                        <input type="text"
+                                            class="form-control @if ($errors->has('jumlahPengajuan')) is-invalid @endif"
+                                            id="jumlahPengajuan" name="jumlahPengajuan"
+                                            value="{{ old('jumlahPengajuan') ?: @$pengajuan->jumlahPengajuan }}"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                            placeholder="Jumlah Dana Yang Dibutuhkan">
+                                        @if ($errors->has('jumlahPengajuan'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('jumlahPengajuan') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+
+                                        <label for="">Presentase Bagi Hasil</label>
+                                        <select name="persentaseBagiHasil"
+                                            class="form-control @if ($errors->has('persentaseBagiHasil')) is-invalid @endif"
+                                            id="persentaseBagiHasil">
+                                            <option value="">-- Pilih Option -- </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 1) selected @endif value="1">1%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 2) selected @endif value="2">2%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 3) selected @endif value="3">3%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 4) selected @endif value="4">4%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 5) selected @endif value="5">5%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 6) selected @endif value="6">6%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 7) selected @endif value="7">7%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 8) selected @endif value="8">8%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 9) selected @endif value="9">9%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 10) selected @endif value="10">10%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 11) selected @endif value="11">11%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 12) selected @endif value="12">12%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 13) selected @endif value="13">13%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 14) selected @endif value="14">14%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 15) selected @endif value="15">15%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 16) selected @endif value="16">16%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 17) selected @endif value="17">17%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 18) selected @endif value="18">18%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 19) selected @endif value="19">19%
+                                            </option>
+                                            <option @if (old('persentaseBagiHasil') ?: @$pengajuan->persentaseBagiHasil == 20) selected @endif value="20">20%
+                                            </option>
+                                        </select>
+                                        @if ($errors->has('persentaseBagiHasil'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('persentaseBagiHasil') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Periode Bagi Hasil</label>
+                                        <select name="periodeBagiHasil"
+                                            class="form-control @if ($errors->has('periodeBagiHasil')) is-invalid @endif"
+                                            id="periodeBagiHasil">
+                                            <option value="">-- Pilih Option -- </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '1') selected @endif value="1">1
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '2') selected @endif value="2">2
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '3') selected @endif value="3">3
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '4') selected @endif value="4">4
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '5') selected @endif value="5">5
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '6') selected @endif value="6">6
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '7') selected @endif value="7">7
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '8') selected @endif value="8">8
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '9') selected @endif value="9">9
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '10') selected @endif value="10">10
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '11') selected @endif value="11">11
+                                                Bulan
+                                            </option>
+                                            <option @if (old('periodeBagihasil') ?: @$pengajuan->periodeBagiHasil == '12') selected @endif value="12">12
+                                                Bulan
+                                            </option>
+                                        </select>
+                                        @if ($errors->has('periodeBagiHasil'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('periodeBagiHasil') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Company Profile</label>
+                                        <input type="file"
+                                            class="form-control @if ($errors->has('companyProfile')) is-invalid @endif"
+                                            id="companyProfile" name="companyProfile">
+                                        @if ($errors->has('companyProfile'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('companyProfile') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Foto KTP Pemilik Usaha</label>
+                                        <input type="file"
+                                            class="form-control @if ($errors->has('fotoKtp')) is-invalid @endif"
+                                            id="fotoKtp" name="fotoKtp">
+                                        @if ($errors->has('fotoKtp'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('fotoKtp') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Gambar Produk Usaha</label>
+                                        <input type="file"
+                                            class="form-control @if ($errors->has('gambarProduk')) is-invalid @endif"
+                                            id="gambarProduk" name="gambarProduk">
+                                        @if ($errors->has('gambarProduk'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('gambarProduk') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Laporan Keuangan Tiga Bulan Terakhir</label>
+                                        <input type="file"
+                                            class="form-control @if ($errors->has('omsetTigaBulanTerakhir')) is-invalid @endif"
+                                            id="omsetTigaBulanTerakhir" name="omsetTigaBulanTerakhir">
+                                        @if ($errors->has('omsetTigaBulanTerakhir'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('omsetTigaBulanTerakhir') }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Button -->
+                            {{-- <div class="row">
                             <div class="col text-right">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
+                        </div> --}}
+
                         </div>
-                    </form>
+                    @endif
+
 
                 </div>
-
-            </div>
+            </form>
 
         </div>
 
     </div>
+
+    @push('scripts')
+        <script>
+            function modalCancelPengajuan(uri) {
+                Swal.fire({
+                    title: "Anda yakin ingin batalkan pengajuan dana?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Ya, batalkan",
+                    cancelButtonText: "Tutup"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = uri;
+                        Swal.fire("Saved!", "", "success");
+                    } else if (result.isDenied) {
+                        Swal.fire("Changes are not saved", "", "info");
+                    }
+                });
+            }
+        </script>
+    @endpush
+
 
 @endsection
