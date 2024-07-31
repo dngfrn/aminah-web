@@ -55,16 +55,16 @@ class PemilikUsahaController extends Controller
         $data['user_id'] = Auth::user()->id;
         if($pengajuan){
             // Validate Folder Exists
-            File::ensureDirectoryExists('asset/ktp');
-            File::ensureDirectoryExists('asset/companyProfile');
-            File::ensureDirectoryExists('asset/omsetTigaBulanTerakhir');
-            File::ensureDirectoryExists('asset/gambarProduk');
+            File::ensureDirectoryExists(public_path('asset/ktp'));
+            File::ensureDirectoryExists(public_path('asset/companyProfile'));
+            File::ensureDirectoryExists(public_path('asset/omsetTigaBulanTerakhir'));
+            File::ensureDirectoryExists(public_path('asset/gambarProduk'));
 
             $files = [];
             if($request->hasFile('fotoKtp')){
                 $fileKtp = $request->file('fotoKtp');
                 $filenameKtp = time() . "." . $fileKtp->extension();
-                $fileKtp->move('asset/ktp', $filenameKtp);
+                $fileKtp->move(public_path('asset/ktp'), $filenameKtp);
                 $data['fotoKtp'] = $filenameKtp;
 
                 if(File::exists(public_path('asset/ktp/'.$pengajuan->fotoKtp))){
@@ -74,7 +74,7 @@ class PemilikUsahaController extends Controller
             if($request->hasFile('gambarProduk')){
                 $fileGambarProduk = $request->file('gambarProduk');
                 $filenameGambarProduk = time() . "." . $fileGambarProduk->extension();
-                $fileGambarProduk->move('asset/gambarProduk', $filenameGambarProduk);
+                $fileGambarProduk->move(public_path('asset/gambarProduk'), $filenameGambarProduk);
                 $data['gambarProduk'] = $filenameGambarProduk;
 
                 if(File::exists(public_path('asset/gambarProduk/'.$pengajuan->gambarProduk))){
@@ -85,7 +85,7 @@ class PemilikUsahaController extends Controller
             if($request->hasFile('omsetTigaBulanTerakhir')){
                 $fileOmsetTigaBulan = $request->file('omsetTigaBulanTerakhir');
                 $filenameOmsetTigaBulan = time() . "." . $fileOmsetTigaBulan->extension();
-                $fileOmsetTigaBulan->move('asset/omsetTigaBulanTerakhir', $filenameOmsetTigaBulan);
+                $fileOmsetTigaBulan->move(public_path('asset/omsetTigaBulanTerakhir'), $filenameOmsetTigaBulan);
                 $data['omsetTigaBulanTerakhir'] = $filenameOmsetTigaBulan;
 
                 if(File::exists(public_path('asset/omsetTigaBulanTerakhir/'.$pengajuan->omsetTigaBulanTerakhir))){
@@ -96,7 +96,7 @@ class PemilikUsahaController extends Controller
             if($request->hasFile('companyProfile')){
                 $fileCompanyProfile = $request->file('companyProfile');
                 $filenameCompanyProfile = time() . "." . $fileCompanyProfile->extension();
-                $fileCompanyProfile->move('asset/companyProfile', $filenameCompanyProfile);
+                $fileCompanyProfile->move(public_path('asset/companyProfile'), $filenameCompanyProfile);
                 $data['companyProfile'] = $filenameCompanyProfile;
 
                 if(File::exists(public_path('asset/companyProfile/'.$pengajuan->companyProfile))){
@@ -134,15 +134,15 @@ class PemilikUsahaController extends Controller
             $filenameCompanyProfile = time() . "." . $fileCompanyProfile->extension();
 
             // Validate Folder Exists
-            File::ensureDirectoryExists('asset/ktp');
-            File::ensureDirectoryExists('asset/companyProfile');
-            File::ensureDirectoryExists('asset/omsetTigaBulanTerakhir');
-            File::ensureDirectoryExists('asset/gambarProduk');
+            File::ensureDirectoryExists(public_path('asset/ktp'));
+            File::ensureDirectoryExists(public_path('asset/companyProfile'));
+            File::ensureDirectoryExists(public_path('asset/omsetTigaBulanTerakhir'));
+            File::ensureDirectoryExists(public_path('asset/gambarProduk'));
 
-            $fileKtp->move('asset/ktp', $filenameKtp);
-            $fileCompanyProfile->move('asset/companyProfile', $filenameCompanyProfile);
-            $fileOmsetTigaBulan->move('asset/omsetTigaBulanTerakhir', $filenameOmsetTigaBulan);
-            $fileGambarProduk->move('asset/gambarProduk', $filenameGambarProduk);
+            $fileKtp->move(public_path('asset/ktp'), $filenameKtp);
+            $fileCompanyProfile->move(public_path('asset/companyProfile'), $filenameCompanyProfile);
+            $fileOmsetTigaBulan->move(public_path('asset/omsetTigaBulanTerakhir'), $filenameOmsetTigaBulan);
+            $fileGambarProduk->move(public_path('asset/gambarProduk'), $filenameGambarProduk);
 
             $data['fotoKtp'] = $filenameKtp;
             $data['companyProfile'] = $filenameCompanyProfile;
