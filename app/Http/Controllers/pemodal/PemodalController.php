@@ -60,7 +60,7 @@ class PemodalController extends Controller
 
     public function indexSetoran($id)
     {
-        $pendanaan = Pendanaan::where('id', decrypt($id))->select('id', 'totalPembayaran', 'created_at')->first();
+        $pendanaan = Pendanaan::with('pemodal')->where('id', decrypt($id))->select('id', 'pemodal_id', 'totalPembayaran', 'created_at')->first();
         return view('subpemodal.indexsetoran', compact('pendanaan'));
     }
 
