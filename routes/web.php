@@ -86,6 +86,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/cancelPengajuan/{id}', 'PemilikUsahaController@cancelPengajuan')->name('cancelPengajuan');
         Route::post('/terima-pendanaan', 'PemilikUsahaController@receivePendanaan')->name('receivePendanaan');
         Route::post('/setor-pendanaan', 'PemilikUsahaController@sendPendanaan')->name('sendPendanaan');
+        Route::get('/list-pengajuan/{userId}', 'PemilikUsahaController@listPengajuan')->name('listPengajuan');
+        Route::get('/view-pengajuan/{id}', 'PemilikUsahaController@viewPengajuan')->name('viewPengajuan');
     });
 
     Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'role:admin'], function () {

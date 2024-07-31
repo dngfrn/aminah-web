@@ -199,4 +199,22 @@ class PemilikUsahaController extends Controller
             return redirect()->back()->withErrors('Gagal! Pengajuan tidak ditemukan.');
         }
     }
+
+    public function listPengajuan($userId)
+    {
+        if (auth()->user()->id != $userId) {
+            return redirect()->back()->withErrors('Gagal! Anda tidak memiliki akses.');
+        }
+        $data['dataPengajuan'] = Pengajuan::with('review')->where('user_id', '=', $userId)->first();
+        return view('pemilikUsaha.listPengajuan', $data);
+    }
+
+    public function viewPengajuan($id)
+    {
+        $pengajuan = Pengajuan::with('review')->where('id', $id)->first();
+
+        return view('pengajuan.view', [
+            'pengajuan' => $pengajuan,
+        ]);
+    }
 }

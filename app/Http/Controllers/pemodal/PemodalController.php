@@ -20,24 +20,19 @@ class PemodalController extends Controller
         $pemodal = Pemodal::where('user_id', auth()->id())->first();
         if ($pemodal) {
             $search = $request->input('search');
-            $search = str_replace('.', '', $search); 
-            $pengajuan = Pengajuan::whereHas('review', function($query) {
-                $query->where('statusPengajuan', 'Accept');
-            })->when($search, function($query, $search) {
-                return $query->where(function($query) use ($search) {
-                    $query->where('namaUsaha', 'like', "%{$search}%") 
-                          ->orWhere('jumlahPengajuan', 'like', "%{$search}%"); 
-                });
-            })->orderBy('id', 'asc')->get();
-    
-            $totalInvestor = Pendanaan::whereHas('review', function($query) {
+            $search = str_replace('.', '', $search);
+            $pengajuan = Pengajuan::whereHas('review', function ($query) {
+                $query->where('statusPengajuan', 'ACCEPT');
+            })->orderBy('updated_at', 'desc')->get();
+
+            $totalInvestor = Pendanaan::whereHas('review', function ($query) {
                 $query->where('statusPengajuan', 'Accept');
             })->select('review_id', \DB::raw('COUNT(review_id) as total'))->groupBy('review_id')->get()->keyBy('review_id');
 
             $dataProgress = [];
             foreach ($pengajuan as $item) {
-                $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan',function($query){
-                    $query->where('statusPendanaan','<>','REJECT');
+                $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan', function ($query) {
+                    $query->where('statusPendanaan', '<>', 'REJECT');
                 })->sum(\DB::raw('jumlahUnit * 100000'));
                 $dataProgress[$item->id] = ($totalPendanaan / $item->jumlahPengajuan) * 100;
                 $dataProgress[$item->terkumpul] = $totalPendanaan;
@@ -46,48 +41,52 @@ class PemodalController extends Controller
             $pengajuan = $pengajuan->reject(function ($item) use ($dataProgress) {
                 return $dataProgress[$item->id] >= 100;
             });
-            
+
             // dd($pengajuan);
-            return view('subpemodal.index', compact('pengajuan', 'totalInvestor', 'dataProgress','search',));
+            return view('subpemodal.index', compact('pengajuan', 'totalInvestor', 'dataProgress', 'search',));
         } else {
             return view('subpemodal.add');
         }
     }
 
-    public function indexPendanaan(){
+    public function indexPendanaan()
+    {
         $pendanaan = Pendanaan::where('pemodal_id', auth()->id())
-        ->with(['statusPendanaan' => function($query) {
-            $query->from('status_pendanaan');
-        }])->get();
+            ->with(['statusPendanaan' => function ($query) {
+                $query->from('status_pendanaan');
+            }])->get();
         return view('subpemodal.indexpendanaan', compact('pendanaan'));
     }
 
-    public function indexSetoran($id){
-        $pendanaan = Pendanaan::where('id', decrypt($id))->select('id','totalPembayaran', 'created_at')->first();
+    public function indexSetoran($id)
+    {
+        $pendanaan = Pendanaan::where('id', decrypt($id))->select('id', 'totalPembayaran', 'created_at')->first();
         return view('subpemodal.indexsetoran', compact('pendanaan'));
     }
 
-    public function indexPenarikan($id){
-        $pendanaan = Pendanaan::where('id', decrypt($id))->select('id','totalPembayaran', 'review_id')->first();
-    
-        $result = Pengajuan::whereHas('review', function($query) use ($pendanaan) {
+    public function indexPenarikan($id)
+    {
+        $pendanaan = Pendanaan::where('id', decrypt($id))->select('id', 'totalPembayaran', 'review_id')->first();
+
+        $result = Pengajuan::whereHas('review', function ($query) use ($pendanaan) {
             $query->where('id', $pendanaan->review_id);
         })->first(['persentaseBagiHasil', 'periodeBagiHasil']);
 
-        return view('subpemodal.indexpenarikan', compact('pendanaan', 'result', ));
+        return view('subpemodal.indexpenarikan', compact('pendanaan', 'result',));
     }
 
-    public function storePenarikan(Request $request, $id){
+    public function storePenarikan(Request $request, $id)
+    {
         PendanaanStatus::where('pendanaan_id', decrypt($id))->update(['statusPendanaan' => 'DONE']);
 
         return redirect()->back()->withSuccess('Bukti transfer berhasil diupload!');
-
     }
 
-    public function uploadBukti(Request $request, $id){
+    public function uploadBukti(Request $request, $id)
+    {
         $file = $request->file('bukti_transfer');
 
-        $filename = time().".".$file->extension();
+        $filename = time() . "." . $file->extension();
         $file->move('asset/bukti_transfer', $filename);
         $data = $request->except('_token');
         $data['buktiTransfer'] = $filename;
@@ -106,23 +105,24 @@ class PemodalController extends Controller
                 [
                     'user_id' => ['required', 'unique:pemodal,user_id', 'exists:users,id', 'in:' . auth()->id()],
                     'namaLengkap' => ['required', 'string', 'max:255'],
-                    'jenisKelamin' => ['required', 'string', 'max:255','in:Laki - Laki,Perempuan'],
-                    "alamat"    => ['required','string'],
-                    "tempatLahir"    => ['required','string','max:255'],
-                    "tanggalLahir"    => ['required','date'],
-                    "pekerjaan"    => ['required','string','max:255'],
-                    "namaBank"    => ['required','string','max:255'],
-                    "noRekening"    => ['required','string','max:255'],
+                    'jenisKelamin' => ['required', 'string', 'max:255', 'in:Laki - Laki,Perempuan'],
+                    "alamat"    => ['required', 'string'],
+                    "tempatLahir"    => ['required', 'string', 'max:255'],
+                    "tanggalLahir"    => ['required', 'date'],
+                    "pekerjaan"    => ['required', 'string', 'max:255'],
+                    "namaBank"    => ['required', 'string', 'max:255'],
+                    "noRekening"    => ['required', 'string', 'max:255'],
                     // "fotoKtp" => "required|mimes:jpeg,jpg,bmp,png,gif,svg,pdf|max:10000"
-                    "fotoKtp"   => ['required','mimes:jpeg,jpg,bmp,png,gif,svg,pdf','max:10000']
-                ]);
-                
+                    "fotoKtp"   => ['required', 'mimes:jpeg,jpg,bmp,png,gif,svg,pdf', 'max:10000']
+                ]
+            );
+
             if (!$validate->passes()) {
                 return redirect()->back()->withErrors($validate->messages())->withInput();
             }
             $file = $request->file('fotoKtp');
 
-            $filename = time().".".$file->extension();
+            $filename = time() . "." . $file->extension();
             $file->move('asset/ktp', $filename);
 
             $data = $request->except('_token');
@@ -130,45 +130,46 @@ class PemodalController extends Controller
             Pemodal::create($data);
 
             return redirect()->back()->withSuccess('Data berhasil disimpan !');
-
-        }catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return redirect()->back()->withErrors($th->getMessage())->withInput();
         }
     }
-    public function show($id){
+    public function show($id)
+    {
         $data = Pengajuan::find(decrypt($id));
         $data->profitBulanan = $data->jumlahPengajuan * $data->persentaseBagiHasil / 100;
-    
+
         $dataProgress = [];
         $totalInvestor = [];
-    
-        $pengajuan = Pengajuan::whereHas('review', function($query) {
+
+        $pengajuan = Pengajuan::whereHas('review', function ($query) {
             $query->where('statusPengajuan', 'Accept');
         })->orderBy('id', 'asc')->get();
-    
+
         foreach ($pengajuan as $item) {
-            $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan',function($query){
-                $query->where('statusPendanaan','<>','REJECT');
+            $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan', function ($query) {
+                $query->where('statusPendanaan', '<>', 'REJECT');
             })->sum(\DB::raw('jumlahUnit * 100000'));
             $dataProgress[$item->id] = ($totalPendanaan / $item->jumlahPengajuan) * 100;
             $dataProgress[$item->terkumpul] = $totalPendanaan;
             $totalInvestor[$item->review->id] = Pendanaan::where('review_id', $item->review->id)->count();
         }
-        return view("subpemodal.show", compact('data', 'totalInvestor','dataProgress'));
+        return view("subpemodal.show", compact('data', 'totalInvestor', 'dataProgress'));
     }
 
-    public function showpembelian($id){
+    public function showpembelian($id)
+    {
         $decryptedId = decrypt($id);
         $data = Pengajuan::find($decryptedId);
 
-        $pengajuan = Pengajuan::whereHas('review', function($query) {
+        $pengajuan = Pengajuan::whereHas('review', function ($query) {
             $query->where('statusPengajuan', 'Accept');
         })->orderBy('id', 'asc')->get();
 
         $totalUnit = [];
         foreach ($pengajuan as $item) {
-            $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan',function($query){
-                $query->where('statusPendanaan','<>','REJECT');
+            $totalPendanaan = Pendanaan::where('review_id', $item->review->id)->whereHas('statusPendanaan', function ($query) {
+                $query->where('statusPendanaan', '<>', 'REJECT');
             })->sum(\DB::raw('jumlahUnit * 100000'));
             $totalUnit['totalpendanaan'] = $totalPendanaan;
         }
@@ -179,32 +180,34 @@ class PemodalController extends Controller
 
         return view("subpemodal.pembelian", compact('data', 'reviewId', 'sisatotal'));
     }
-    public function pendanaan(Request $request){
+    public function pendanaan(Request $request)
+    {
         $validate = Validator::make(
             $request->all(),
             [
                 'review_id' => ['required', 'string', 'max:255'],
                 'pemodal_id' => ['required', 'string', 'max:255'],
                 'namaUsaha' => ['required', 'string', 'max:255'],
-                "jumlahUnit" => ['required','string'],
-                "totalPembayaran"=> ['required','string','max:255'],
-            ]);
-        
+                "jumlahUnit" => ['required', 'string'],
+                "totalPembayaran" => ['required', 'string', 'max:255'],
+            ]
+        );
+
         if (!$validate->passes()) {
             return redirect()->back()->withErrors($validate->messages())->withInput();
         }
-    
+
         $data = $request->except('_token');
         $data['totalPembayaran'] = str_replace('.', '', $data['totalPembayaran']);
         $data['buktiTransfer'] = "";
-    
+
         $pendanaan = Pendanaan::create($data);
-    
+
         PendanaanStatus::create([
             'pendanaan_id' => $pendanaan->id,
-            'statusPendanaan' => 'PENDING', 
+            'statusPendanaan' => 'PENDING',
         ]);
-    
+
         return redirect()->route('pemodal.subIndexPendanaan')->withSuccess('Pembelian Success !!');
     }
 }

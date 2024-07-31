@@ -108,6 +108,12 @@
                             <span>{{ __('Profile Usaha') }}</span>
                         </a>
                     </li>
+                    <li class="nav-item {{ Nav::isRoute('pemilikUsaha.listPengajuan') }}    ">
+                        <a class="nav-link" href="{{ route('pemilikUsaha.listPengajuan', auth()->user()->id) }}">
+                            <i class="fas fa-fw fa-building"></i>
+                            <span>{{ __('List Pengajuan Usaha') }}</span>
+                        </a>
+                    </li>
                 @endif
                 @if (Auth::user()->role == 'pemodal')
                     <hr class="sidebar-divider">
@@ -352,6 +358,24 @@
                 })
             }
         });
+    </script>
+
+    <script>
+        function modalCancelPengajuan(uri) {
+            Swal.fire({
+                title: "Anda yakin ingin batalkan pengajuan dana?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Ya, batalkan",
+                cancelButtonText: "Tutup"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = uri;
+                }
+            });
+        }
     </script>
 
     @stack('scripts')
