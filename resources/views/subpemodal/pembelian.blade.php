@@ -36,7 +36,7 @@
 
                     <p class="card-text"><strong style="font-size: 1.2em;">Persentase imbal hasil: {{ $data->persentaseBagiHasil }}%</strong></p>
                     <p class="card-text"><strong style="font-size: 1.2em;">Waktu jatuh tempo (bulan): {{ $data->periodeBagiHasil }} Bulan</strong></p><hr>
-                    <p class="card-text"><strong style="font-size: 1.2em;">Harga Per Unit : Rp 100.000</strong></p>
+                    <p class="card-text"><strong style="font-size: 1.2em;">Harga Per Unit : Rp 10.000.000</strong></p>
                     <p class="mr-3"><strong style="font-size: 1.2em;">Jumlah Unit: <span id="jumlahUnitDisplay" name="jumlahUnitDisplay">1</strong></span></p>
                     <div id="alertPlaceholder"></div>
                     <div class="form-group d-flex align-items-center">
@@ -61,7 +61,7 @@
                     </div>
                     <div class="form-group">
                         <label for="biayaLayanan">Biaya Layanan (Rp)</label>
-                        <input type="text" class="form-control" id="biayaLayanan" readonly value="100.000">
+                        <input type="text" class="form-control" id="biayaLayanan" readonly value="10.000">
                     </div>
                     <div class="form-group">
                         <label for="totalPembayaran">Total Pembayaran (Rp)</label>
@@ -131,9 +131,9 @@
 
     function updatePembayaran() {
         var jumlahUnit = document.getElementById('jumlahUnit').value;
-        var hargaPerUnit = 100000; // Harga per unit
+        var hargaPerUnit = 1000000; // Harga per unit
         var nilaiInvestasi = jumlahUnit * hargaPerUnit;
-        var biayaLayanan = 100000; // Biaya layanan tetap
+        var biayaLayanan = 10000; // Biaya layanan tetap
         var totalPembayaran = nilaiInvestasi + biayaLayanan;
 
         var maxInvestasi = parseInt(document.getElementById('nilaiInvestasi').getAttribute('data-max'));

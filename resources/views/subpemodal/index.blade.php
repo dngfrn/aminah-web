@@ -56,7 +56,7 @@
                             <div class="card-body shadow border">
                                 <div class="row">
                                     <div class="col-md-2">
-                                        <img src="{{ asset('asset/gambarProduk/' . $item->gambarProduk) }}" class="img-fluid" alt="Business Image">
+                                        <img src="{{ asset('asset/gambarProduk/'.$item->gambarProduk) }}" class="img-fluid" alt="Business Image">
                                     </div>
                                     <div class="col-md-10">
                                         <h5 class="card-title"><strong>{{ $item->namaUsaha }}</strong></h5>

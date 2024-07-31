@@ -154,13 +154,13 @@
                                     <input type="text" class="form-control" id="periodeBagiHasil"
                                         value="{{ $datas->periodeBagiHasil }} Bulan" disabled name="periodeBagiHasil" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
                                         placeholder="Periode Bagi Hasil">
-                                </div>
+                                </div>  
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Company Profile</label>
                                     <input type="file" class="form-control" id="companyProfile"
-                                        name="companyProfile">
+                                        name="companyProfile" >{{ $datas->companyProfile }}
                                 </div>
                             </div>
                         </div>
@@ -168,13 +168,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Foto KTP Pemilik Usaha</label>
-                                    <input type="file" class="form-control" id="fotoKtp" name="fotoKtp">
+                                    <input type="file" class="form-control" id="fotoKtp" name="fotoKtp">{{ $datas->fotoKtp }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Gambar Produk Usaha</label>
-                                    <input type="file" class="form-control" id="gambarProduk" name="gambarProduk">
+                                    <input type="file" class="form-control" id="gambarProduk" name="gambarProduk">{{ $datas->gambarProduk }}
                                 </div>
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                                 <div class="form-group">
                                     <label for="">Laporan Keuangan Tiga Bulan Terakhir</label>
                                     <input type="file" class="form-control" id="omsetTigaBulanTerakhir"
-                                        name="omsetTigaBulanTerakhir">
+                                        name="omsetTigaBulanTerakhir">{{ $datas->omsetTigaBulanTerakhir }}
                                 </div>
                             </div>
                         </div>
